@@ -1,0 +1,7 @@
+{
+    "rust-analyzer.cargo.extraEnv": {
+        "RUSTFLAGS": "-Clinker=clang -Clink-arg=-fuse-ld=lld"
+    },
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true
+}
