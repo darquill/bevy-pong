@@ -4,7 +4,7 @@ use bevy::prelude::*;
 pub struct MainCamera;
 
 fn setup_camera(mut commands: Commands) {
-    commands.spawn((Camera2dBundle { ..default() }, MainCamera));
+    commands.spawn((Camera2dBundle::default(), MainCamera));
 }
 
 pub struct MainCameraPlugin;
