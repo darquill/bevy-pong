@@ -4,15 +4,25 @@ use bevy::{
 };
 
 const PADDLE_SIZE: Vec2 = Vec2::new(1.0, 2.0);
+const PADDLE_SPEED: f32 = 200.0;
 
 #[derive(Component)]
-pub struct Controller {
-    player: bool,
+pub struct PlayerController;
+
+#[derive(Component)]
+pub struct AiController;
+
+#[derive(Component)]
+pub struct Paddle {
+    pub speed: f32,
 }
 
-#[derive(Bundle)]
-pub struct Paddle {
-    controller: Controller,
+impl Paddle {
+    fn new() -> Paddle {
+        Paddle {
+            speed: PADDLE_SPEED,
+        }
+    }
 }
 
 fn add_paddles(
@@ -34,9 +44,8 @@ fn add_paddles(
             },
             ..default()
         },
-        Paddle {
-            controller: Controller { player: true },
-        },
+        Paddle::new(),
+        PlayerController,
     ));
 
     // P2 Paddle
@@ -51,9 +60,8 @@ fn add_paddles(
             },
             ..default()
         },
-        Paddle {
-            controller: Controller { player: true },
-        },
+        Paddle::new(),
+        AiController,
     ));
 }
 
