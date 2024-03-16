@@ -5,6 +5,7 @@
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "rust-analyzer.linkedProjects": [
+        "./Cargo.toml",
         "./Cargo.toml"
     ],
     "editor.defaultFormatter": null,

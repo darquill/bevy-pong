@@ -1,9 +1,8 @@
-mod camera;
-mod paddle;
+mod pong;
 
 use bevy::prelude::*;
-use camera::MainCameraPlugin;
-use paddle::Paddle;
+use pong::camera::MainCameraPlugin;
+use pong::paddle::Paddle;
 
 fn setup(mut commands: Commands) {
     commands.spawn(Paddle);
