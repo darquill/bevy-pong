@@ -3,7 +3,7 @@ use bevy::{
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
 };
 
-const PADDLE_SIZE: Vec2 = Vec2::new(1.0, 2.0);
+const PADDLE_SIZE: Vec2 = Vec2::new(1.5, 4.0);
 const PADDLE_SPEED: f32 = 200.0;
 
 #[derive(Component)]
@@ -38,7 +38,7 @@ fn add_paddles(
             mesh: Mesh2dHandle(meshes.add(Rectangle::new(10.0, 20.0))),
             material: materials.add(Color::WHITE),
             transform: Transform {
-                translation: Vec3::new(-200.0, 0.0, 0.0),
+                translation: Vec3::new(-400.0, 0.0, 0.0),
                 scale: PADDLE_SIZE.extend(1.0),
                 ..default()
             },
@@ -54,7 +54,7 @@ fn add_paddles(
             mesh: Mesh2dHandle(meshes.add(Rectangle::new(10.0, 20.0))),
             material: materials.add(Color::WHITE),
             transform: Transform {
-                translation: Vec3::new(200.0, 0.0, 0.0),
+                translation: Vec3::new(400.0, 0.0, 0.0),
                 scale: PADDLE_SIZE.extend(1.0),
                 ..default()
             },
