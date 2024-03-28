@@ -1,5 +1,4 @@
 use bevy::{
-    math::bounding::Aabb2d,
     prelude::*,
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
 };
@@ -15,22 +14,20 @@ pub struct PlayerController;
 #[derive(Component)]
 pub struct AiController;
 
-#[derive(Component, Clone)]
+#[derive(Component, Clone, Debug)]
 pub struct Paddle {
     pub speed: f32,
     pub size: Vec2,
-    pub collision_rect: Aabb2d,
 }
 
 #[derive(Component)]
 pub struct DebugPaddle;
 
 impl Paddle {
-    fn new(center: Vec2) -> Paddle {
+    fn new() -> Paddle {
         Paddle {
             speed: PADDLE_SPEED,
             size: PADDLE_SIZE,
-            collision_rect: Aabb2d::new(center, PADDLE_SIZE / 2.),
         }
     }
 }
@@ -54,9 +51,9 @@ fn add_paddles(
             },
             ..default()
         },
-        Paddle::new(center.truncate()),
+        Paddle::new(),
         PlayerController,
-        Collider,
+        Collider::new(center.truncate(), PADDLE_SIZE),
     ));
 
     let center: Vec3 = Vec3::new(400.0, 0.0, 0.0);
@@ -71,9 +68,9 @@ fn add_paddles(
             },
             ..default()
         },
-        Paddle::new(center.truncate()),
+        Paddle::new(),
         AiController,
-        Collider,
+        Collider::new(center.truncate(), PADDLE_SIZE),
     ));
 }
 

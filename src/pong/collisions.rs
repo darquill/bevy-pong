@@ -3,10 +3,20 @@ use bevy::{
     prelude::*,
 };
 
-use super::{ball::Ball, paddle::Paddle};
+use super::ball::Ball;
 
 #[derive(Component, Debug)]
-pub struct Collider;
+pub struct Collider {
+    pub collision_rect: Aabb2d,
+}
+
+impl Collider {
+    pub fn new(center: Vec2, size: Vec2) -> Collider {
+        Collider {
+            collision_rect: Aabb2d::new(center, size / 2.),
+        }
+    }
+}
 
 #[derive(Event, Default)]
 pub struct CollisionEvent;
@@ -26,12 +36,12 @@ pub struct CollisionsPlugin;
 
 fn check_for_collisions(
     mut ball_query: Query<(&mut Ball, &Transform), With<Ball>>,
-    colliders: Query<&Paddle, (With<Collider>, Without<Ball>)>,
+    colliders_query: Query<&Collider, (With<Collider>, Without<Ball>)>,
 ) {
     let (mut ball, ball_transform) = ball_query.single_mut();
 
-    for paddle in &colliders {
-        let rect = paddle.collision_rect;
+    for collider in &colliders_query {
+        let rect = collider.collision_rect;
         let bounding_circle =
             BoundingCircle::new(ball_transform.translation.truncate(), ball.size / 2.0);
         let collision = collide_with_rect(bounding_circle, rect);

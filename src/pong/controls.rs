@@ -5,6 +5,7 @@ use crate::config::WINDOW_HEIGHT;
 
 use super::{
     ball::Ball,
+    collisions::Collider,
     paddle::{Paddle, PlayerController},
 };
 pub struct GameControlsPlugin;
@@ -28,11 +29,14 @@ fn check_oob(y: f32, size: f32, offset: f32) -> Option<OOB> {
 }
 
 fn move_paddle(
-    mut paddles: Query<(&mut Transform, &mut Paddle), (With<Paddle>, With<PlayerController>)>,
+    mut paddles: Query<
+        (&mut Transform, &mut Paddle, &mut Collider),
+        (With<Paddle>, With<PlayerController>),
+    >,
     keyboard_input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
 ) {
-    let (mut paddle_transform, mut paddle) = paddles.single_mut();
+    let (mut paddle_transform, paddle, mut collider) = paddles.single_mut();
 
     let offset = paddle.speed * time.delta_seconds();
     let mut direction = 1.;
@@ -55,7 +59,8 @@ fn move_paddle(
         paddle_transform.translation.y -= offset;
     }
 
-    paddle.collision_rect = Aabb2d::new(paddle_transform.translation.truncate(), paddle.size / 2.);
+    collider.collision_rect =
+        Aabb2d::new(paddle_transform.translation.truncate(), paddle.size / 2.);
 }
 
 fn reset_ball(

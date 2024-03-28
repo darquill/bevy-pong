@@ -4,8 +4,6 @@ use bevy::{
 };
 use rand::prelude::*;
 
-use crate::pong::collisions::Collider;
-
 pub struct BallPlugin;
 
 const BALL_SIZE: f32 = 10.0;
@@ -39,7 +37,6 @@ fn add_ball(
             velocity: Vec2::new(-1.0, rng.gen_range(-0.5..0.5)),
             size: BALL_SIZE,
         },
-        Collider,
     ));
 }
 
