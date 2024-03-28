@@ -4,6 +4,7 @@ pub mod camera;
 pub mod collisions;
 pub mod controls;
 pub mod paddle;
+pub mod walls;
 
 use ai::AiPlugin;
 use ball::BallPlugin;
@@ -12,6 +13,7 @@ use camera::MainCameraPlugin;
 use collisions::CollisionsPlugin;
 use controls::GameControlsPlugin;
 use paddle::PaddlePlugin;
+use walls::WallsPlugin;
 
 pub struct PongGame;
 
@@ -24,6 +26,7 @@ impl Plugin for PongGame {
             BallPlugin,
             CollisionsPlugin,
             AiPlugin,
+            WallsPlugin,
         ));
     }
 }
