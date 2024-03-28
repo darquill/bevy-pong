@@ -4,14 +4,17 @@ use bevy::{
 };
 use rand::prelude::*;
 
+use crate::pong::collisions::Collider;
+
 pub struct BallPlugin;
 
-const BALL_SIZE: Vec2 = Vec2::new(1.0, 1.0);
+const BALL_SIZE: f32 = 10.0;
 const BALL_SPEED: f32 = 300.0;
 
 #[derive(Component)]
 pub struct Ball {
-    velocity: Vec2,
+    pub velocity: Vec2,
+    pub size: f32,
 }
 
 fn add_ball(
@@ -24,18 +27,19 @@ fn add_ball(
 
     commands.spawn((
         MaterialMesh2dBundle {
-            mesh: Mesh2dHandle(meshes.add(Circle::new(10.0))),
+            mesh: Mesh2dHandle(meshes.add(Circle::new(BALL_SIZE))),
             material: materials.add(Color::WHITE),
             transform: Transform {
                 translation: Vec3::new(0.0, 0.0, 0.0),
-                scale: BALL_SIZE.extend(1.0),
                 ..default()
             },
             ..default()
         },
         Ball {
-            velocity: Vec2::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0)),
+            velocity: Vec2::new(-1.0, rng.gen_range(-0.5..0.5)),
+            size: BALL_SIZE,
         },
+        Collider,
     ));
 }
 

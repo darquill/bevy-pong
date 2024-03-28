@@ -1,9 +1,12 @@
 use bevy::{
+    math::bounding::Aabb2d,
     prelude::*,
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
 };
 
-const PADDLE_SIZE: Vec2 = Vec2::new(1.5, 4.0);
+use crate::pong::collisions::Collider;
+
+const PADDLE_SIZE: Vec2 = Vec2::new(25.0, 75.0);
 const PADDLE_SPEED: f32 = 200.0;
 
 #[derive(Component)]
@@ -12,15 +15,22 @@ pub struct PlayerController;
 #[derive(Component)]
 pub struct AiController;
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct Paddle {
     pub speed: f32,
+    pub size: Vec2,
+    pub collision_rect: Aabb2d,
 }
 
+#[derive(Component)]
+pub struct DebugPaddle;
+
 impl Paddle {
-    fn new() -> Paddle {
+    fn new(center: Vec2) -> Paddle {
         Paddle {
             speed: PADDLE_SPEED,
+            size: PADDLE_SIZE,
+            collision_rect: Aabb2d::new(center, PADDLE_SIZE / 2.),
         }
     }
 }
@@ -32,36 +42,38 @@ fn add_paddles(
 ) {
     println!("[PLUGIN:PaddlePlugin] add_paddles");
 
+    let center: Vec3 = Vec3::new(-400.0, 0.0, 0.0);
     // P1 Paddle
     commands.spawn((
         MaterialMesh2dBundle {
-            mesh: Mesh2dHandle(meshes.add(Rectangle::new(10.0, 20.0))),
+            mesh: Mesh2dHandle(meshes.add(Rectangle::from_size(PADDLE_SIZE))),
             material: materials.add(Color::WHITE),
             transform: Transform {
-                translation: Vec3::new(-400.0, 0.0, 0.0),
-                scale: PADDLE_SIZE.extend(1.0),
+                translation: center,
                 ..default()
             },
             ..default()
         },
-        Paddle::new(),
+        Paddle::new(center.truncate()),
         PlayerController,
+        Collider,
     ));
 
+    let center: Vec3 = Vec3::new(400.0, 0.0, 0.0);
     // P2 Paddle
     commands.spawn((
         MaterialMesh2dBundle {
-            mesh: Mesh2dHandle(meshes.add(Rectangle::new(10.0, 20.0))),
+            mesh: Mesh2dHandle(meshes.add(Rectangle::from_size(PADDLE_SIZE))),
             material: materials.add(Color::WHITE),
             transform: Transform {
-                translation: Vec3::new(400.0, 0.0, 0.0),
-                scale: PADDLE_SIZE.extend(1.0),
+                translation: center,
                 ..default()
             },
             ..default()
         },
-        Paddle::new(),
+        Paddle::new(center.truncate()),
         AiController,
+        Collider,
     ));
 }
 
