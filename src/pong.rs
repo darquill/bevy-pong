@@ -1,9 +1,11 @@
+pub mod ai;
 pub mod ball;
 pub mod camera;
 pub mod collisions;
 pub mod controls;
 pub mod paddle;
 
+use ai::AiPlugin;
 use ball::BallPlugin;
 use bevy::prelude::*;
 use camera::MainCameraPlugin;
@@ -21,6 +23,7 @@ impl Plugin for PongGame {
             GameControlsPlugin,
             BallPlugin,
             CollisionsPlugin,
+            AiPlugin,
         ));
     }
 }
