@@ -1,11 +1,31 @@
 use bevy::{math::bounding::Aabb2d, prelude::*};
 use rand::{thread_rng, Rng};
 
+use crate::config::WINDOW_HEIGHT;
+
 use super::{
     ball::Ball,
     paddle::{Paddle, PlayerController},
 };
 pub struct GameControlsPlugin;
+
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+enum OOB {
+    Bottom,
+    Top,
+}
+
+fn check_oob(y: f32, size: f32, offset: f32) -> Option<OOB> {
+    if y + (size / 2.) + offset > WINDOW_HEIGHT / 2. - 1. {
+        return Some(OOB::Top);
+    }
+
+    if y - (size / 2.) + offset < -WINDOW_HEIGHT / 2. + 1. {
+        return Some(OOB::Bottom);
+    }
+
+    None
+}
 
 fn move_paddle(
     mut paddles: Query<(&mut Transform, &mut Paddle), (With<Paddle>, With<PlayerController>)>,
@@ -14,17 +34,28 @@ fn move_paddle(
 ) {
     let (mut paddle_transform, mut paddle) = paddles.single_mut();
 
-    if keyboard_input.pressed(KeyCode::KeyW) {
-        paddle_transform.translation.y += paddle.speed * time.delta_seconds();
-    }
+    let offset = paddle.speed * time.delta_seconds();
+    let mut direction = 1.;
 
     if keyboard_input.pressed(KeyCode::KeyS) {
-        paddle_transform.translation.y -= paddle.speed * time.delta_seconds();
+        direction = -1.;
+    }
+
+    let oob = check_oob(
+        paddle_transform.translation.y,
+        paddle.size.y,
+        offset * direction,
+    );
+
+    if keyboard_input.pressed(KeyCode::KeyW) && oob != Some(OOB::Top) {
+        paddle_transform.translation.y += offset;
+    }
+
+    if keyboard_input.pressed(KeyCode::KeyS) && oob != Some(OOB::Bottom) {
+        paddle_transform.translation.y -= offset;
     }
 
     paddle.collision_rect = Aabb2d::new(paddle_transform.translation.truncate(), paddle.size / 2.);
-
-    // TODO: Add clamp to avoid paddle moving beyond screen borders.
 }
 
 fn reset_ball(
