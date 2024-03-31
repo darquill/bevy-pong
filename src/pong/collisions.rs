@@ -40,10 +40,9 @@ fn check_for_collisions(
 ) {
     let (mut ball, ball_transform) = ball_query.single_mut();
 
-    for (collider, maybe_paddle) in &colliders_query {
+    for (collider, maybe_paddle) in colliders_query.iter() {
         let rect = collider.collision_rect;
-        let bounding_circle =
-            BoundingCircle::new(ball_transform.translation.truncate(), ball.size / 2.0);
+        let bounding_circle = BoundingCircle::new(ball_transform.translation.truncate(), ball.size);
         let collision = collide_with_rect(bounding_circle, rect);
 
         if let (Some(collision), offset) = collision {
@@ -68,6 +67,10 @@ fn check_for_collisions(
             if reflect_y {
                 ball.velocity.y = -ball.velocity.y;
             }
+
+            ball.velocity = ball
+                .velocity
+                .clamp(Vec2 { x: -1., y: -1. }, Vec2 { x: 1., y: 1. })
         }
     }
 }

@@ -45,7 +45,7 @@ fn add_ball(
             mesh: Mesh2dHandle(meshes.add(Circle::new(BALL_SIZE))),
             material: materials.add(Color::WHITE),
             transform: Transform {
-                translation: Vec3::new(0.0, 0.0, 0.0),
+                translation: Vec3::ZERO,
                 ..default()
             },
             ..default()

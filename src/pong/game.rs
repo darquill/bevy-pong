@@ -13,13 +13,13 @@ fn new_round(
     if !new_round_event.is_empty() {
         new_round_event.clear();
 
-        for mut paddle in &mut paddles_query {
+        for mut paddle in paddles_query.iter_mut() {
             paddle.translation.y = 0.;
         }
 
         let (mut ball_transform, mut ball) = ball_query.single_mut();
 
-        ball_transform.translation = Vec2 { x: 0.0, y: 0.0 }.extend(0.0);
+        ball_transform.translation = Vec3::ZERO;
         ball.reset();
     }
 }

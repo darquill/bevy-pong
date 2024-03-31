@@ -1,10 +1,8 @@
 use bevy::{math::bounding::Aabb2d, prelude::*};
-use rand::{thread_rng, Rng};
 
 use crate::config::{WALL_HEIGHT, WINDOW_HEIGHT};
 
 use super::{
-    ball::Ball,
     collisions::Collider,
     game::NewRoundEvent,
     paddle::{Paddle, PlayerController},
@@ -62,26 +60,13 @@ fn new_round(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut new_round_event: EventWriter<NewRoundEvent>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::KeyN) {
-        new_round_event.send_default();
-    }
-}
-
-fn reset_ball(
-    mut ball: Query<(&mut Transform, &mut Ball), With<Ball>>,
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-) {
-    let mut rng = thread_rng();
-
-    let (mut ball_transform, mut ball) = ball.single_mut();
     if keyboard_input.just_pressed(KeyCode::KeyX) {
-        ball_transform.translation = Vec3::new(0.0, 0.0, 0.0);
-        ball.velocity = Vec2::new(-1.0, rng.gen_range(-0.5..0.5));
+        new_round_event.send_default();
     }
 }
 
 impl Plugin for GameControlsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (move_paddle, reset_ball, new_round));
+        app.add_systems(Update, (move_paddle, new_round));
     }
 }

@@ -37,8 +37,6 @@ fn add_paddles(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    println!("[PLUGIN:PaddlePlugin] add_paddles");
-
     let center: Vec3 = Vec3::new(-WINDOW_WIDTH / 2. + PADDLE_SIZE.x, 0.0, 0.0);
     // P1 Paddle
     commands.spawn((
