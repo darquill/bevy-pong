@@ -4,7 +4,7 @@ use crate::config::{WALL_HEIGHT, WINDOW_HEIGHT};
 
 use super::{
     collisions::Collider,
-    game::NewRoundEvent,
+    game::{GameStatus, NewRoundEvent},
     paddle::{Paddle, PlayerController},
 };
 pub struct GameControlsPlugin;
@@ -16,7 +16,12 @@ fn move_paddle(
     >,
     keyboard_input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
+    game_status: Res<GameStatus>,
 ) {
+    if game_status.pause {
+        return;
+    }
+
     let (mut paddle_transform, paddle, mut collider) = paddles.single_mut();
 
     let mut direction = 0.;

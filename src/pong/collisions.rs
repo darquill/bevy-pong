@@ -48,7 +48,7 @@ fn check_for_collisions(
     mut goal_event: EventWriter<GoalEvent>,
     game_status: Res<GameStatus>,
 ) {
-    if game_status.pause_collisions {
+    if game_status.pause {
         return;
     }
 

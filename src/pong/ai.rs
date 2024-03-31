@@ -5,6 +5,7 @@ use crate::config::{GAME_DIFFICULTY, WALL_HEIGHT, WINDOW_HEIGHT};
 use super::{
     ball::Ball,
     collisions::Collider,
+    game::GameStatus,
     paddle::{AiController, Paddle},
 };
 
@@ -12,7 +13,12 @@ fn move_paddle(
     mut ai_paddles: Query<(&mut Transform, &Paddle, &mut Collider), With<AiController>>,
     ball_query: Query<&Transform, (With<Ball>, Without<Paddle>)>,
     time: Res<Time>,
+    game_status: Res<GameStatus>,
 ) {
+    if game_status.pause {
+        return;
+    }
+
     let ball_transform = ball_query.single();
     let (mut paddle_transform, paddle, mut collider) = ai_paddles.single_mut();
 

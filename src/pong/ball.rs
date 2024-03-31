@@ -4,6 +4,8 @@ use bevy::{
 };
 use rand::prelude::*;
 
+use super::game::GameStatus;
+
 pub struct BallPlugin;
 
 const BALL_SIZE: f32 = 10.0;
@@ -54,7 +56,15 @@ fn add_ball(
     ));
 }
 
-fn move_ball(mut ball_query: Query<(&mut Transform, &Ball), With<Ball>>, time: Res<Time>) {
+fn move_ball(
+    mut ball_query: Query<(&mut Transform, &Ball), With<Ball>>,
+    time: Res<Time>,
+    game_status: Res<GameStatus>,
+) {
+    if game_status.pause {
+        return;
+    }
+
     let (mut ball_transform, ball) = ball_query.single_mut();
 
     ball_transform.translation.x += BALL_SPEED * ball.velocity.x * time.delta_seconds();
