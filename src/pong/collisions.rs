@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
 };
 
-use super::ball::Ball;
+use super::{ball::Ball, paddle::Paddle};
 
 #[derive(Component, Debug)]
 pub struct Collider {
@@ -36,17 +36,17 @@ pub struct CollisionsPlugin;
 
 fn check_for_collisions(
     mut ball_query: Query<(&mut Ball, &Transform), With<Ball>>,
-    colliders_query: Query<&Collider, (With<Collider>, Without<Ball>)>,
+    colliders_query: Query<(&Collider, Option<&Paddle>), (With<Collider>, Without<Ball>)>,
 ) {
     let (mut ball, ball_transform) = ball_query.single_mut();
 
-    for collider in &colliders_query {
+    for (collider, maybe_paddle) in &colliders_query {
         let rect = collider.collision_rect;
         let bounding_circle =
             BoundingCircle::new(ball_transform.translation.truncate(), ball.size / 2.0);
         let collision = collide_with_rect(bounding_circle, rect);
 
-        if let Some(collision) = collision {
+        if let (Some(collision), offset) = collision {
             let mut reflect_x = false;
             let mut reflect_y = false;
 
@@ -59,6 +59,10 @@ fn check_for_collisions(
 
             if reflect_x {
                 ball.velocity.x = -ball.velocity.x;
+
+                if maybe_paddle.is_some() {
+                    ball.velocity.y += -offset / 50.;
+                }
             }
 
             if reflect_y {
@@ -68,9 +72,9 @@ fn check_for_collisions(
     }
 }
 
-fn collide_with_rect(ball: BoundingCircle, rect: Aabb2d) -> Option<Collision> {
+fn collide_with_rect(ball: BoundingCircle, rect: Aabb2d) -> (Option<Collision>, f32) {
     if !ball.intersects(&rect) {
-        return None;
+        return (None, 0.);
     }
 
     let closest = rect.closest_point(ball.center());
@@ -87,7 +91,7 @@ fn collide_with_rect(ball: BoundingCircle, rect: Aabb2d) -> Option<Collision> {
         Collision::Bottom
     };
 
-    Some(side)
+    (Some(side), rect.center().y - ball.center().y)
 }
 
 impl Plugin for CollisionsPlugin {

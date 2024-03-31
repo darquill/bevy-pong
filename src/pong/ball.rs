@@ -7,7 +7,7 @@ use rand::prelude::*;
 pub struct BallPlugin;
 
 const BALL_SIZE: f32 = 10.0;
-const BALL_SPEED: f32 = 300.0;
+const BALL_SPEED: f32 = 500.0;
 
 #[derive(Component)]
 pub struct Ball {

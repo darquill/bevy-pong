@@ -5,7 +5,7 @@ use crate::config::{WINDOW_HEIGHT, WINDOW_WIDTH};
 use super::collisions::Collider;
 
 #[derive(Component)]
-struct Wall;
+pub struct Wall;
 
 fn create_walls(mut commands: Commands) {
     commands.spawn((
@@ -13,11 +13,11 @@ fn create_walls(mut commands: Commands) {
         Collider::new(
             Vec2 {
                 x: 0.,
-                y: WINDOW_HEIGHT / 2.,
+                y: WINDOW_HEIGHT / 2. + 100.,
             },
             Vec2 {
                 x: WINDOW_WIDTH,
-                y: 2.,
+                y: 200.,
             },
         ),
     ));
@@ -27,11 +27,11 @@ fn create_walls(mut commands: Commands) {
         Collider::new(
             Vec2 {
                 x: 0.,
-                y: -WINDOW_HEIGHT / 2.,
+                y: -WINDOW_HEIGHT / 2. - 100.,
             },
             Vec2 {
                 x: WINDOW_WIDTH,
-                y: 2.,
+                y: 200.,
             },
         ),
     ));
