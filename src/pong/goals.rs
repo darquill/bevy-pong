@@ -1,39 +1,37 @@
+use super::collisions::Collider;
+use crate::config::{GOAL_WIDTH, WALL_HEIGHT, WINDOW_HEIGHT, WINDOW_WIDTH};
 use bevy::{
     prelude::*,
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
 };
 
-use crate::config::{WALL_HEIGHT, WINDOW_HEIGHT, WINDOW_WIDTH};
-
-use super::collisions::Collider;
-
 #[derive(Component)]
-pub struct Wall;
+pub struct Goal;
 
-fn create_walls(
+fn create_goals(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let size = Vec2 {
-        x: WINDOW_WIDTH,
-        y: WALL_HEIGHT * 4.,
+        x: GOAL_WIDTH * 4.,
+        y: WINDOW_HEIGHT - WALL_HEIGHT * 2.,
     };
 
     let display_size = size + Vec2 { x: 0., y: 0. };
 
     let center = Vec3 {
-        x: 0.,
-        y: WINDOW_HEIGHT / 2. + WALL_HEIGHT,
+        x: -WINDOW_WIDTH / 2. - GOAL_WIDTH * 2. + 2.,
+        y: 0.,
         z: 0.,
     };
 
     commands.spawn((
-        Wall,
+        Goal,
         Collider::new(center.truncate(), size),
         MaterialMesh2dBundle {
             mesh: Mesh2dHandle(meshes.add(Rectangle::from_size(display_size))),
-            material: materials.add(Color::GRAY),
+            material: materials.add(Color::ORANGE_RED),
             transform: Transform {
                 translation: center,
                 ..default()
@@ -43,17 +41,17 @@ fn create_walls(
     ));
 
     let center = Vec3 {
-        x: 0.,
-        y: -WINDOW_HEIGHT / 2. - WALL_HEIGHT,
+        x: WINDOW_WIDTH / 2. + GOAL_WIDTH * 2. - 2.,
+        y: 0.,
         z: 0.,
     };
 
     commands.spawn((
-        Wall,
+        Goal,
         Collider::new(center.truncate(), size),
         MaterialMesh2dBundle {
             mesh: Mesh2dHandle(meshes.add(Rectangle::from_size(display_size))),
-            material: materials.add(Color::GRAY),
+            material: materials.add(Color::SEA_GREEN),
             transform: Transform {
                 translation: center,
                 ..default()
@@ -62,10 +60,11 @@ fn create_walls(
         },
     ));
 }
-pub struct WallsPlugin;
 
-impl Plugin for WallsPlugin {
+pub struct GoalsPlugin;
+
+impl Plugin for GoalsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, create_walls);
+        app.add_systems(Startup, create_goals);
     }
 }

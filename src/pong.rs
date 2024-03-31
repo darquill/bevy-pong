@@ -4,6 +4,7 @@ pub mod camera;
 pub mod collisions;
 pub mod controls;
 pub mod game;
+pub mod goals;
 pub mod paddle;
 pub mod walls;
 
@@ -14,6 +15,7 @@ use camera::MainCameraPlugin;
 use collisions::CollisionsPlugin;
 use controls::GameControlsPlugin;
 use game::GamePlugin;
+use goals::GoalsPlugin;
 use paddle::PaddlePlugin;
 use walls::WallsPlugin;
 
@@ -30,6 +32,7 @@ impl Plugin for PongGame {
             AiPlugin,
             WallsPlugin,
             GamePlugin,
+            GoalsPlugin,
         ));
     }
 }

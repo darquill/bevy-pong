@@ -3,7 +3,12 @@ use bevy::{
     prelude::*,
 };
 
-use super::{ball::Ball, paddle::Paddle};
+use super::{
+    ball::Ball,
+    game::{GameStatus, GoalEvent},
+    goals::Goal,
+    paddle::Paddle,
+};
 
 #[derive(Component, Debug)]
 pub struct Collider {
@@ -11,7 +16,7 @@ pub struct Collider {
 }
 
 impl Collider {
-    pub fn new(center: Vec2, size: Vec2) -> Collider {
+    pub fn new(center: Vec2, size: Vec2) -> Self {
         Collider {
             collision_rect: Aabb2d::new(center, size / 2.),
         }
@@ -36,16 +41,29 @@ pub struct CollisionsPlugin;
 
 fn check_for_collisions(
     mut ball_query: Query<(&mut Ball, &Transform), With<Ball>>,
-    colliders_query: Query<(&Collider, Option<&Paddle>), (With<Collider>, Without<Ball>)>,
+    colliders_query: Query<
+        (&Collider, Option<&Paddle>, Option<&Goal>),
+        (With<Collider>, Without<Ball>),
+    >,
+    mut goal_event: EventWriter<GoalEvent>,
+    game_status: Res<GameStatus>,
 ) {
+    if game_status.pause_collisions {
+        return;
+    }
+
     let (mut ball, ball_transform) = ball_query.single_mut();
 
-    for (collider, maybe_paddle) in colliders_query.iter() {
+    for (collider, maybe_paddle, maybe_goal) in colliders_query.iter() {
         let rect = collider.collision_rect;
         let bounding_circle = BoundingCircle::new(ball_transform.translation.truncate(), ball.size);
         let collision = collide_with_rect(bounding_circle, rect);
 
         if let (Some(collision), offset) = collision {
+            if maybe_goal.is_some() {
+                goal_event.send_default();
+            }
+
             let mut reflect_x = false;
             let mut reflect_y = false;
 
