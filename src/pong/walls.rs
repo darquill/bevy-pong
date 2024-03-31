@@ -3,7 +3,7 @@ use bevy::{
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
 };
 
-use crate::config::{WINDOW_HEIGHT, WINDOW_WIDTH};
+use crate::config::{WALL_HEIGHT, WINDOW_HEIGHT, WINDOW_WIDTH};
 
 use super::collisions::Collider;
 
@@ -17,7 +17,7 @@ fn create_walls(
 ) {
     let size = Vec2 {
         x: WINDOW_WIDTH,
-        y: 200.0,
+        y: WALL_HEIGHT * 4.,
     };
 
     let display_size = size + Vec2 { x: 0., y: 0. };
@@ -34,7 +34,7 @@ fn create_walls(
             center.truncate(),
             Vec2 {
                 x: WINDOW_WIDTH,
-                y: 200.,
+                y: WALL_HEIGHT * 4.,
             },
         ),
         MaterialMesh2dBundle {

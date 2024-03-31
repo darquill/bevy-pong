@@ -1,29 +1,12 @@
 use bevy::{math::bounding::Aabb2d, prelude::*};
 
-use crate::config::WINDOW_HEIGHT;
+use crate::config::{GAME_DIFFICULTY, WALL_HEIGHT, WINDOW_HEIGHT};
 
 use super::{
     ball::Ball,
     collisions::Collider,
     paddle::{AiController, Paddle},
 };
-
-enum OOB {
-    Bottom,
-    Top,
-}
-
-fn check_oob(y: f32, size: f32, offset: f32) -> Option<OOB> {
-    if y + (size / 2.) + offset > WINDOW_HEIGHT / 2. - 1. {
-        return Some(OOB::Top);
-    }
-
-    if y - (size / 2.) + offset < -WINDOW_HEIGHT / 2. + 1. {
-        return Some(OOB::Bottom);
-    }
-
-    None
-}
 
 fn move_paddle(
     mut ai_paddles: Query<(&mut Transform, &Paddle, &mut Collider), With<AiController>>,
@@ -33,28 +16,28 @@ fn move_paddle(
     let ball_transform = ball_query.single();
     let (mut paddle_transform, paddle, mut collider) = ai_paddles.single_mut();
 
-    let direction = match ball_transform.translation.y > paddle_transform.translation.y {
-        true => 1.,
-        false => -1.,
-    };
-
-    let offset = direction * paddle.speed * time.delta_seconds();
-
-    let oob = check_oob(paddle_transform.translation.y, paddle.size.y, offset);
-
-    if oob.is_some() {
-        return;
-    }
-
-    paddle_transform.translation = paddle_transform.translation.lerp(
-        Vec3::new(
-            paddle_transform.translation.x,
-            ball_transform.translation.y,
-            0.0,
-        ),
-        0.1,
-    );
-    // paddle_transform.translation.y += offset;
+    paddle_transform.translation = paddle_transform
+        .translation
+        .lerp(
+            Vec3::new(
+                paddle_transform.translation.x,
+                ball_transform.translation.y,
+                0.0,
+            ),
+            GAME_DIFFICULTY * time.delta_seconds(),
+        )
+        .clamp(
+            Vec3 {
+                x: paddle_transform.translation.x,
+                y: -WINDOW_HEIGHT / 2. + paddle.size.y / 2. + WALL_HEIGHT,
+                z: 0.,
+            },
+            Vec3 {
+                x: paddle_transform.translation.x,
+                y: WINDOW_HEIGHT / 2. - paddle.size.y / 2. - WALL_HEIGHT,
+                z: 0.,
+            },
+        );
 
     collider.collision_rect =
         Aabb2d::new(paddle_transform.translation.truncate(), paddle.size / 2.);
@@ -63,6 +46,6 @@ fn move_paddle(
 pub struct AiPlugin;
 impl Plugin for AiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(FixedUpdate, move_paddle);
+        app.add_systems(Update, move_paddle);
     }
 }

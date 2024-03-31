@@ -3,10 +3,10 @@ use bevy::{
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
 };
 
-use crate::pong::collisions::Collider;
-
-const PADDLE_SIZE: Vec2 = Vec2::new(25.0, 75.0);
-const PADDLE_SPEED: f32 = 200.0;
+use crate::{
+    config::{PADDLE_SIZE, PADDLE_SPEED, WINDOW_WIDTH},
+    pong::collisions::Collider,
+};
 
 #[derive(Component)]
 pub struct PlayerController;
@@ -39,7 +39,7 @@ fn add_paddles(
 ) {
     println!("[PLUGIN:PaddlePlugin] add_paddles");
 
-    let center: Vec3 = Vec3::new(-400.0, 0.0, 0.0);
+    let center: Vec3 = Vec3::new(-WINDOW_WIDTH / 2. + PADDLE_SIZE.x, 0.0, 0.0);
     // P1 Paddle
     commands.spawn((
         MaterialMesh2dBundle {
@@ -56,7 +56,7 @@ fn add_paddles(
         Collider::new(center.truncate(), PADDLE_SIZE),
     ));
 
-    let center: Vec3 = Vec3::new(400.0, 0.0, 0.0);
+    let center: Vec3 = Vec3::new(WINDOW_WIDTH / 2. - PADDLE_SIZE.x, 0.0, 0.0);
     // P2 Paddle
     commands.spawn((
         MaterialMesh2dBundle {

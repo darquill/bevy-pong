@@ -50,6 +50,6 @@ fn move_ball(mut ball_query: Query<(&mut Transform, &Ball), With<Ball>>, time: R
 impl Plugin for BallPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, add_ball)
-            .add_systems(FixedUpdate, move_ball);
+            .add_systems(Update, move_ball);
     }
 }

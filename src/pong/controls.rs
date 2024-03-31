@@ -1,7 +1,7 @@
 use bevy::{math::bounding::Aabb2d, prelude::*};
 use rand::{thread_rng, Rng};
 
-use crate::config::WINDOW_HEIGHT;
+use crate::config::{WALL_HEIGHT, WINDOW_HEIGHT};
 
 use super::{
     ball::Ball,
@@ -9,24 +9,6 @@ use super::{
     paddle::{Paddle, PlayerController},
 };
 pub struct GameControlsPlugin;
-
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
-enum OOB {
-    Bottom,
-    Top,
-}
-
-fn check_oob(y: f32, size: f32, offset: f32) -> Option<OOB> {
-    if y + (size / 2.) + offset > WINDOW_HEIGHT / 2. - 1. {
-        return Some(OOB::Top);
-    }
-
-    if y - (size / 2.) + offset < -WINDOW_HEIGHT / 2. + 1. {
-        return Some(OOB::Bottom);
-    }
-
-    None
-}
 
 fn move_paddle(
     mut paddles: Query<
@@ -38,26 +20,38 @@ fn move_paddle(
 ) {
     let (mut paddle_transform, paddle, mut collider) = paddles.single_mut();
 
-    let offset = paddle.speed * time.delta_seconds();
-    let mut direction = 1.;
+    let mut direction = 0.;
+
+    if keyboard_input.pressed(KeyCode::KeyW) {
+        direction = 1.;
+    }
 
     if keyboard_input.pressed(KeyCode::KeyS) {
         direction = -1.;
     }
 
-    let oob = check_oob(
-        paddle_transform.translation.y,
-        paddle.size.y,
-        offset * direction,
-    );
-
-    if keyboard_input.pressed(KeyCode::KeyW) && oob != Some(OOB::Top) {
-        paddle_transform.translation.y += offset;
-    }
-
-    if keyboard_input.pressed(KeyCode::KeyS) && oob != Some(OOB::Bottom) {
-        paddle_transform.translation.y -= offset;
-    }
+    paddle_transform.translation = paddle_transform
+        .translation
+        .lerp(
+            Vec3::new(
+                paddle_transform.translation.x,
+                paddle_transform.translation.y + paddle.speed * direction * time.delta_seconds(),
+                0.0,
+            ),
+            paddle.speed,
+        )
+        .clamp(
+            Vec3 {
+                x: paddle_transform.translation.x,
+                y: -WINDOW_HEIGHT / 2. + paddle.size.y / 2. + WALL_HEIGHT,
+                z: 0.,
+            },
+            Vec3 {
+                x: paddle_transform.translation.x,
+                y: WINDOW_HEIGHT / 2. - paddle.size.y / 2. - WALL_HEIGHT,
+                z: 0.,
+            },
+        );
 
     collider.collision_rect =
         Aabb2d::new(paddle_transform.translation.truncate(), paddle.size / 2.);
@@ -70,7 +64,7 @@ fn reset_ball(
     let mut rng = thread_rng();
 
     let (mut ball_transform, mut ball) = ball.single_mut();
-    if keyboard_input.pressed(KeyCode::KeyX) {
+    if keyboard_input.just_pressed(KeyCode::KeyX) {
         ball_transform.translation = Vec3::new(0.0, 0.0, 0.0);
         ball.velocity = Vec2::new(-1.0, rng.gen_range(-0.5..0.5));
     }
@@ -78,6 +72,6 @@ fn reset_ball(
 
 impl Plugin for GameControlsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(FixedUpdate, (move_paddle, reset_ball));
+        app.add_systems(Update, (move_paddle, reset_ball));
     }
 }
