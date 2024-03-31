@@ -6,6 +6,7 @@ use crate::config::{WALL_HEIGHT, WINDOW_HEIGHT};
 use super::{
     ball::Ball,
     collisions::Collider,
+    game::NewRoundEvent,
     paddle::{Paddle, PlayerController},
 };
 pub struct GameControlsPlugin;
@@ -57,6 +58,15 @@ fn move_paddle(
         Aabb2d::new(paddle_transform.translation.truncate(), paddle.size / 2.);
 }
 
+fn new_round(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut new_round_event: EventWriter<NewRoundEvent>,
+) {
+    if keyboard_input.just_pressed(KeyCode::KeyN) {
+        new_round_event.send_default();
+    }
+}
+
 fn reset_ball(
     mut ball: Query<(&mut Transform, &mut Ball), With<Ball>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
@@ -72,6 +82,6 @@ fn reset_ball(
 
 impl Plugin for GameControlsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (move_paddle, reset_ball));
+        app.add_systems(Update, (move_paddle, reset_ball, new_round));
     }
 }

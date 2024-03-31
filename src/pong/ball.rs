@@ -15,14 +15,31 @@ pub struct Ball {
     pub size: f32,
 }
 
+fn random_velocity() -> Vec2 {
+    let mut rng = thread_rng();
+    Vec2::new(-1.0, rng.gen_range(-0.5..0.5))
+}
+
+impl Ball {
+    fn new() -> Ball {
+        let velocity = random_velocity();
+
+        Ball {
+            velocity: velocity,
+            size: BALL_SIZE,
+        }
+    }
+
+    pub fn reset(&mut self) {
+        self.velocity = random_velocity();
+    }
+}
+
 fn add_ball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    println!("[PLUGIN:PaddlePlugin] add_ball");
-    let mut rng = thread_rng();
-
     commands.spawn((
         MaterialMesh2dBundle {
             mesh: Mesh2dHandle(meshes.add(Circle::new(BALL_SIZE))),
@@ -33,10 +50,7 @@ fn add_ball(
             },
             ..default()
         },
-        Ball {
-            velocity: Vec2::new(-1.0, rng.gen_range(-0.5..0.5)),
-            size: BALL_SIZE,
-        },
+        Ball::new(),
     ));
 }
 

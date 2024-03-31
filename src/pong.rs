@@ -3,6 +3,7 @@ pub mod ball;
 pub mod camera;
 pub mod collisions;
 pub mod controls;
+pub mod game;
 pub mod paddle;
 pub mod walls;
 
@@ -12,6 +13,7 @@ use bevy::prelude::*;
 use camera::MainCameraPlugin;
 use collisions::CollisionsPlugin;
 use controls::GameControlsPlugin;
+use game::GamePlugin;
 use paddle::PaddlePlugin;
 use walls::WallsPlugin;
 
@@ -27,6 +29,7 @@ impl Plugin for PongGame {
             CollisionsPlugin,
             AiPlugin,
             WallsPlugin,
+            GamePlugin,
         ));
     }
 }
