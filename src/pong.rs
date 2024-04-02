@@ -6,6 +6,7 @@ pub mod controls;
 pub mod game;
 pub mod goals;
 pub mod paddle;
+pub mod ui;
 pub mod walls;
 
 use ai::AiPlugin;
@@ -17,6 +18,7 @@ use controls::GameControlsPlugin;
 use game::GamePlugin;
 use goals::GoalsPlugin;
 use paddle::PaddlePlugin;
+use ui::UiPlugin;
 use walls::WallsPlugin;
 
 pub struct PongGame;
@@ -33,6 +35,7 @@ impl Plugin for PongGame {
             WallsPlugin,
             GamePlugin,
             GoalsPlugin,
+            UiPlugin,
         ));
     }
 }

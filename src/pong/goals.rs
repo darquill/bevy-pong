@@ -6,7 +6,10 @@ use bevy::{
 };
 
 #[derive(Component)]
-pub struct Goal;
+pub struct P1Goal;
+
+#[derive(Component)]
+pub struct CPUGoal;
 
 fn create_goals(
     mut commands: Commands,
@@ -27,7 +30,7 @@ fn create_goals(
     };
 
     commands.spawn((
-        Goal,
+        P1Goal,
         Collider::new(center.truncate(), size),
         MaterialMesh2dBundle {
             mesh: Mesh2dHandle(meshes.add(Rectangle::from_size(display_size))),
@@ -47,7 +50,7 @@ fn create_goals(
     };
 
     commands.spawn((
-        Goal,
+        CPUGoal,
         Collider::new(center.truncate(), size),
         MaterialMesh2dBundle {
             mesh: Mesh2dHandle(meshes.add(Rectangle::from_size(display_size))),

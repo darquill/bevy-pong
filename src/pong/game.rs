@@ -1,24 +1,51 @@
 use bevy::prelude::*;
 
-use super::{ball::Ball, paddle::Paddle};
+use super::{ball::Ball, paddle::Paddle, ui::UpdateScoreEvent};
 
 #[derive(Event, Default)]
 pub struct NewRoundEvent;
 
-#[derive(Event, Default)]
-pub struct GoalEvent;
+#[derive(Resource, Clone, Copy)]
+pub struct Score {
+    pub p1_score: u32,
+    pub cpu_score: u32,
+}
+
+pub enum WhoScored {
+    P1,
+    CPU,
+}
+
+#[derive(Event)]
+pub struct GoalEvent(pub WhoScored);
 
 #[derive(Resource)]
 pub struct GameStatus {
     pub pause: bool,
+    pub score: Score,
 }
 
 #[derive(Resource)]
 struct NewRoundTimer(Timer);
 
-fn goal(mut goal_event: EventReader<GoalEvent>, mut new_round_event: EventWriter<NewRoundEvent>) {
+fn goal(
+    mut goal_event: EventReader<GoalEvent>,
+    mut new_round_event: EventWriter<NewRoundEvent>,
+    mut update_score_event: EventWriter<UpdateScoreEvent>,
+    mut game_status: ResMut<GameStatus>,
+) {
     if !goal_event.is_empty() {
-        goal_event.clear();
+        game_status.pause = true;
+
+        for ev in goal_event.read() {
+            match ev.0 {
+                WhoScored::P1 => game_status.score.p1_score += 1,
+                WhoScored::CPU => game_status.score.cpu_score += 1,
+            }
+
+            update_score_event.send(UpdateScoreEvent(game_status.score));
+        }
+
         new_round_event.send_default();
     }
 }
@@ -65,7 +92,13 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<NewRoundEvent>()
             .add_event::<GoalEvent>()
-            .insert_resource(GameStatus { pause: true })
+            .insert_resource(GameStatus {
+                pause: true,
+                score: Score {
+                    p1_score: 0,
+                    cpu_score: 0,
+                },
+            })
             .insert_resource(NewRoundTimer(Timer::from_seconds(2.0, TimerMode::Once)))
             .add_systems(Update, (countdown_new_round, new_round, goal).chain());
     }

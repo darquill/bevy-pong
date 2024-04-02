@@ -5,8 +5,8 @@ use bevy::{
 
 use super::{
     ball::Ball,
-    game::{GameStatus, GoalEvent},
-    goals::Goal,
+    game::{GameStatus, GoalEvent, WhoScored},
+    goals::{CPUGoal, P1Goal},
     paddle::Paddle,
 };
 
@@ -42,7 +42,12 @@ pub struct CollisionsPlugin;
 fn check_for_collisions(
     mut ball_query: Query<(&mut Ball, &Transform), With<Ball>>,
     colliders_query: Query<
-        (&Collider, Option<&Paddle>, Option<&Goal>),
+        (
+            &Collider,
+            Option<&Paddle>,
+            Option<&P1Goal>,
+            Option<&CPUGoal>,
+        ),
         (With<Collider>, Without<Ball>),
     >,
     mut goal_event: EventWriter<GoalEvent>,
@@ -54,14 +59,18 @@ fn check_for_collisions(
 
     let (mut ball, ball_transform) = ball_query.single_mut();
 
-    for (collider, maybe_paddle, maybe_goal) in colliders_query.iter() {
+    for (collider, maybe_paddle, maybe_p1goal, maybe_cpugoal) in colliders_query.iter() {
         let rect = collider.collision_rect;
         let bounding_circle = BoundingCircle::new(ball_transform.translation.truncate(), ball.size);
         let collision = collide_with_rect(bounding_circle, rect);
 
         if let (Some(collision), offset) = collision {
-            if maybe_goal.is_some() {
-                goal_event.send_default();
+            if maybe_p1goal.is_some() {
+                goal_event.send(GoalEvent(WhoScored::CPU));
+            }
+
+            if maybe_cpugoal.is_some() {
+                goal_event.send(GoalEvent(WhoScored::P1));
             }
 
             let mut reflect_x = false;
